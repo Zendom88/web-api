@@ -2,6 +2,18 @@ from rest_framework.serializers import ModelSerializer
 
 from posts.models import Post
 
+class PostCreateSerializer(ModelSerializer):
+    class Meta:
+        model = Post
+        fields = [
+            'title',
+            # 'slug',
+            'content',
+            'publish',
+            'timestamp',
+            'image',
+        ]
+
 class PostListSerializer(ModelSerializer):
     class Meta:
         model = Post
@@ -24,8 +36,12 @@ class PostDetailSerializer(ModelSerializer):
             'publish',
             'timestamp',
         ]
-
-# """
+#
+# """"
+#
+# from posts.models import Post
+# from posts.api.serializers import PostListSerializer, PostDetailSerializer
+#
 # data = {
 #     "title": "Manual enter post",
 #     "content": "This is a post entered manually via console",

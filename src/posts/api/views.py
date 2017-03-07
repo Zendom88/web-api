@@ -1,4 +1,7 @@
+from django.db.models import Q
+
 from rest_framework.generics import (
+    CreateAPIView,
     DestroyAPIView,
     ListAPIView,
     UpdateAPIView,
@@ -6,7 +9,16 @@ from rest_framework.generics import (
     )
 
 from posts.models import Post
-from .serializers import PostListSerializer, PostDetailSerializer
+from .serializers import (
+    PostCreateSerializer,
+    PostListSerializer,
+    PostDetailSerializer
+    )
+
+
+class PostCreateAPIView(CreateAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostCreateSerializer
 
 
 class PostDetailAPIView(RetrieveAPIView):
@@ -25,5 +37,16 @@ class PostDeleteAPIView(DestroyAPIView):
     lookup_field = 'slug'
 
 class PostListAPIView (ListAPIView):
-    queryset = Post.objects.all()
     serializer_class = PostListSerializer
+
+    def get_queryset(self, *args, **kwargs):
+        queryset_list = Post.objects.all()
+        query = self.request.GET.get("q")
+    	if query:
+    		queryset_list = queryset_list.filter(
+    				Q(title__icontains=query)|
+    				Q(content__icontains=query)|
+    				Q(user__first_name__icontains=query) |
+    				Q(user__last_name__icontains=query)
+    				).distinct()
+        return queryset_list
